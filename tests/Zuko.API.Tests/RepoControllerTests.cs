@@ -1,20 +1,33 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Moq;
 using NUnit.Framework;
 using System.Threading.Tasks;
 using Zuko.API.Controllers;
+using Zuko.Data;
 
 namespace Zuko.API.Tests;
 
 [TestFixture]
 public class RepoControllerTests
 {
-    [Test]
-    public async Task GetRepos_WhenCalled_ReturnsActionResult()
+    private Mock<IConfiguration> _configuration;
+    private Mock<ApplicationContext> _context;
+
+    [SetUp]
+    public void SetUp()
     {
-        var controller = new RepoController();
+        _configuration = new Mock<IConfiguration>();
+        _context = new Mock<ApplicationContext>();
+    }
+
+    [Test]
+    public async Task GetRepos_WhenCalled_ReturnsOkResult()
+    {
+        var controller = new RepoController(_configuration.Object, _context.Object);
 
         var result = await controller.GetRepos();
 
-        Assert.That(result, Is.InstanceOf<IActionResult>());
+        Assert.That(result, Is.TypeOf<OkObjectResult>());
     }
 }

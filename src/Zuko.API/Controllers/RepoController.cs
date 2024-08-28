@@ -1,48 +1,80 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Zuko.Data;
 
-namespace Zuko.API.Controllers
+namespace Zuko.API.Controllers;
+
+[Route("api/repos")]
+[ApiController]
+public class RepoController(IConfiguration configuration, ApplicationContext context) : ControllerBase
 {
-    [Route("api/repos")]
-    [ApiController]
-    public class RepoController : ControllerBase
-    {
-        [HttpGet]
-        public async Task<IActionResult> GetRepos()
-        {
-            List<RepoResponse> repos =
-            [
-                new () { Id = 1, Name = "Iroh" },
-                new () { Id = 2, Name = "Zuko" },
-                new () { Id = 3, Name = "test-ninja" },
-                new () { Id = 4, Name = "backend" },
-            ];
+    private readonly IConfiguration _configuration = configuration;
+    private readonly ApplicationContext _context = context;
 
-            await Task.Delay(100);
+    [HttpGet]
+    public async Task<IActionResult> GetRepos()
+    {
+        try
+        {
+            var repos = await _context.Repos.ToListAsync();
 
             return Ok(repos);
         }
-
-        public class RepoResponse
+        catch (Exception ex)
         {
-            [JsonProperty("id")]
-            public int Id { get; set; }
-            [JsonProperty("name")]
-            public string Name { get; set; }
-            [JsonProperty("description")]
-            public string Description { get; set; }
-            [JsonProperty("html_url")]
-            public string Link { get; set; } 
-            [JsonProperty("created_at")]
-            public string CreatedAt { get; set; } 
-            [JsonProperty("language")]
-            public string Language { get; set; } 
-            [JsonProperty("private")]
-            public bool Private { get; set; }
-            [JsonProperty("updated_at")]
-            public string UpdatedAt { get; set; } 
+            return BadRequest(new FailureResponse
+            {
+                Message = ex.Message,
+            });
         }
     }
+
+    [HttpGet, Route("private")]
+    public async Task<IActionResult> GetPrivateRepos()
+    {
+        var repos = await _context.Repos.ToListAsync();
+
+        return Ok(repos);
+    }
+
+    [HttpGet, Route("settings")]
+    public async Task<IActionResult> GetSettings()
+    {
+        var setting = _configuration.GetSection("Setting");
+
+        await Task.Delay(100);
+
+        return Ok(setting.Value);
+    }
+
+    public record RepoResponse
+    {
+        [JsonProperty("id")]
+        public int Id { get; init; }
+        [JsonProperty("name")]
+        public string Name { get; init; }
+        [JsonProperty("description")]
+        public string Description { get; init; }
+        [JsonProperty("html_url")]
+        public string Link { get; init; }
+        [JsonProperty("created_at")]
+        public string CreatedAt { get; init; }
+        [JsonProperty("language")]
+        public string Language { get; init; }
+        [JsonProperty("private")]
+        public bool Private { get; init; }
+        [JsonProperty("updated_at")]
+        public string UpdatedAt { get; init; }
+    }
+
+    public record FailureResponse
+    {
+        public bool Success { get; set; } = false;
+        public string Message { get; set; }
+    }
 }
+
