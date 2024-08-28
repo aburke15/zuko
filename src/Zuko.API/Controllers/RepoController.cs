@@ -1,29 +1,32 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Zuko.Data;
 
 namespace Zuko.API.Controllers;
 
 [Route("api/repos")]
 [ApiController]
-public class RepoController(IConfiguration configuration) : ControllerBase
+public class RepoController(IConfiguration configuration, ApplicationContext context) : ControllerBase
 {
     private readonly IConfiguration _configuration = configuration;
+    private readonly ApplicationContext _context = context;
 
     [HttpGet]
     public async Task<IActionResult> GetRepos()
     {
-        List<RepoResponse> repos =
-        [
-            new () { Id = 1, Name = "Iroh" },
-            new () { Id = 2, Name = "Zuko" },
-            new () { Id = 3, Name = "test-ninja" },
-            new () { Id = 4, Name = "backend" },
-        ];
+        var repos = await _context.Repos.ToListAsync();
 
-        await Task.Delay(100);
+        return Ok(repos);
+    }
+
+    [HttpGet, Route("private")]
+    public async Task<IActionResult> GetPrivateRepos()
+    {
+        var repos = await _context.Repos.ToListAsync();
 
         return Ok(repos);
     }
