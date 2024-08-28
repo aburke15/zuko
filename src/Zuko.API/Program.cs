@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Zuko.Data;
+using Zuko.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 PersistenceRegistrar.RegisterPersistence(builder.Services, builder.Configuration);
+ServicesRegistrar.RegisterServices(builder.Services, builder.Configuration);
 
 var app = builder.Build();
 
