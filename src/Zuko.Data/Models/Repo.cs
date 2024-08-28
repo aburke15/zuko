@@ -1,6 +1,6 @@
 ﻿namespace Zuko.Data.Models;
 
-public class Repo
+public class Repo : BaseModel
 {
     public int GitHubId { get; set; }
     public string Name { get; set; }

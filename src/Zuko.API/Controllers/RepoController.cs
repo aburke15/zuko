@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,9 +18,19 @@ public class RepoController(IConfiguration configuration, ApplicationContext con
     [HttpGet]
     public async Task<IActionResult> GetRepos()
     {
-        var repos = await _context.Repos.ToListAsync();
+        try
+        {
+            var repos = await _context.Repos.ToListAsync();
 
-        return Ok(repos);
+            return Ok(repos);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new FailureResponse
+            {
+                Message = ex.Message,
+            });
+        }
     }
 
     [HttpGet, Route("private")]
@@ -59,6 +69,12 @@ public class RepoController(IConfiguration configuration, ApplicationContext con
         public bool Private { get; init; }
         [JsonProperty("updated_at")]
         public string UpdatedAt { get; init; }
+    }
+
+    public record FailureResponse
+    {
+        public bool Success { get; set; } = false;
+        public string Message { get; set; }
     }
 }
 
