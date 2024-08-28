@@ -7,7 +7,7 @@ using Zuko.API.Controllers;
 using Zuko.Data;
 using Zuko.Services.External.API;
 
-namespace Zuko.API.Tests;
+namespace Zuko.API.Tests.Controllers;
 
 [TestFixture]
 public class RepoControllerTests
@@ -28,8 +28,8 @@ public class RepoControllerTests
     public async Task GetRepos_WhenCalled_ReturnsOkResult()
     {
         var controller = new RepoController(
-            _configuration.Object, 
-            _context.Object, 
+            _configuration.Object,
+            _context.Object,
             _gitHubClient.Object);
 
         var result = await controller.GetRepos();
