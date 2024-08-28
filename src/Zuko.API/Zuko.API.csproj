@@ -11,6 +11,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Zuko.Data\Zuko.Data.csproj" />
+    <ProjectReference Include="..\Zuko.Services\Zuko.Services.csproj" />
+    <ProjectReference Include="..\Zuko.Shared\Zuko.Shared.csproj" />
   </ItemGroup>
 
 </Project>
